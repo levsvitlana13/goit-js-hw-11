@@ -15,7 +15,8 @@ if (searchForm) {
   searchForm.addEventListener('submit', async event => {
     event.preventDefault();
 
-    const query = event.target.elements['search-text'].value.trim();
+    const form = event.currentTarget;
+    const query = form.elements['search-text'].value.trim();
 
     if (!query) {
       iziToast.warning({ message: 'Enter search term' });
@@ -28,7 +29,7 @@ if (searchForm) {
     try {
       const data = await getImagesByQuery(query);
 
-      if (!data.hits.length) {
+      if (!data.hits || data.hits.length === 0) {
         iziToast.error({
           message: 'No images found',
           position: 'topRight',
@@ -38,10 +39,13 @@ if (searchForm) {
 
       createGallery(data.hits);
     } catch (error) {
-      iziToast.error({ message: 'Something went wrong!' });
+      iziToast.error({
+        message: 'Something went wrong!',
+        position: 'topRight',
+      });
     } finally {
       hideLoader();
-      event.target.reset();
+      form.reset();
     }
   });
 }
